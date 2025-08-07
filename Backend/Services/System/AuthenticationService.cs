@@ -42,7 +42,7 @@ public class AuthenticationService(
             {
                 var roleId = user.Roles.Select(x => x.Id);
 
-                var user = new UserInfo()
+                var userInfo = new UserInfo()
                 {
                     UserId = user.Id.ToString(),
                     Name = $"{user.FirstName} {user.LastName}",
@@ -50,7 +50,7 @@ public class AuthenticationService(
                     RoleIds = [.. roleId]
                 };
 
-                return user;
+                return userInfo;
             }
         }
         return null;
@@ -60,7 +60,7 @@ public class AuthenticationService(
     {
         var privateKey = _configuration["Authentication:Jwt-AccessToken:PrivateKey"] ?? throw new NullReferenceException("Jwt-AccessToken key not found");
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
 
         var jwtHeader = new JwtHeader(credentials);
         var jwtPayload = new JwtPayload()
@@ -85,7 +85,7 @@ public class AuthenticationService(
     {
         var privateKey = _configuration["Authentication:Jwt-RefreshToken:PrivateKey"] ?? throw new NullReferenceException("Jwt-RefreshToken key not found");
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
 
         var jwtHeader = new JwtHeader(credentials);
         var jwtPayload = new JwtPayload

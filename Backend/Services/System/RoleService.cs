@@ -32,6 +32,8 @@ public class RoleService(DataContext _context) : ServiceBase<Role, RoleSearch>(_
             Data = query.Skip((page - 1) * pageSize).Take(pageSize).ToList()
         };
 
+        _ = TransactionLogRead(result.Data, "system." + nameof(Role));
+
         return Task.FromResult(result);
     }
 

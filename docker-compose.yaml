@@ -1,0 +1,63 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    hostname: sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Something*123"
+      MSSQL_PID: "Developer"
+    volumes:
+      - default:/var/opt/mssql
+    networks:
+      - sqlserver
+    deploy:
+      resources:
+        limits:
+          memory: 8gb
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    hostname: redis
+    networks:
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 8gb
+
+  backend:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: backend
+    hostname: backend
+    depends_on:
+      - sqlserver
+      - redis
+    networks:
+      - sqlserver
+      - redis
+    ports:
+      - 80:8080
+
+volumes:
+  default:
+    name: sql2022_data
+
+networks:
+  sqlserver:
+    name: sqlserver_default
+    ipam:
+      config:
+        - ip_range: 172.100.0.0/24
+          subnet: 172.100.0.0/24
+          gateway: 172.100.0.1
+  redis:
+    name: redis_default
+    ipam:
+      config:
+        - ip_range: 172.100.1.0/24
+          subnet: 172.100.1.0/24
+          gateway: 172.100.1.1

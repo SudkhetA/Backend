@@ -26,6 +26,8 @@ public class NotificationService(DataContext _context) : ServiceBase<Notificatio
             Data = query.Skip((page - 1) * pageSize).Take(pageSize).ToList()
         };
 
+        _ = TransactionLogRead(result.Data, "system." + nameof(Notification));
+
         return Task.FromResult(result);
     }
 

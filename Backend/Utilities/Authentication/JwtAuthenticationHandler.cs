@@ -9,22 +9,22 @@ namespace Backend.Utilities.Authentication;
 
 public class JwtAuthenticationHandler
 {
-    public static void DefaultConfiguration(JwtBearerOptions options, ConfigurationManager configuration)
+    public static void DefaultConfiguration(JwtBearerOptions _options, ConfigurationManager _configuration)
     {
-        var jwtKey = configuration["Authentication:Jwt-AccessToken:PrivateKey"] ?? throw new NullReferenceException("JWT private key not found");
-        options.TokenValidationParameters = new TokenValidationParameters
+        var jwtKey = _configuration["Authentication:Jwt-AccessToken:PrivateKey"] ?? throw new NullReferenceException("JWT private key not found");
+        _options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
-            ValidIssuer = configuration["Authentication:Jwt-AccessToken:Issuer"],
-            ValidAudiences = configuration.GetSection("Authentication:Jwt-AccessToken:Audience").Get<string[]>(),
+            ValidAlgorithms = [SecurityAlgorithms.HmacSha512],
+            ValidIssuer = _configuration["Authentication:Jwt-AccessToken:Issuer"],
+            ValidAudiences = _configuration.GetSection("Authentication:Jwt-AccessToken:Audience").Get<string[]>(),
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
         };
 
-        options.Events = new JwtBearerEvents
+        _options.Events = new JwtBearerEvents
         {
             OnTokenValidated = async context =>
             {
@@ -39,9 +39,9 @@ public class JwtAuthenticationHandler
                     context.Fail("User ID or Session ID could not be validated.");
                     return;
                 }
-
+                
                 var sessionService = context.HttpContext.RequestServices.GetRequiredService<SessionService>();
-                if (await sessionService.IsSessionExists($"access_{userId}", sessionId) == false)
+                if (await sessionService.IsSessionExists($"access_{userId}", sessionId) == false && _configuration.GetSection("IsSessionEnable").Get<bool>())
                 {
                     context.Fail("Session has expired.");
                     return;
@@ -57,6 +57,8 @@ public class JwtAuthenticationHandler
             },
             OnChallenge = context =>
             {
+                context.HandleResponse();
+                
                 context.Response.StatusCode = 401;
                 context.Response.ContentType = "application/json";
                 var result = JsonSerializer.Serialize(new { error = "Authentication failed." });
@@ -72,22 +74,22 @@ public class JwtAuthenticationHandler
         };
     }
 
-    public static void RefreshConfiguration(JwtBearerOptions options, ConfigurationManager configuration)
+    public static void RefreshConfiguration(JwtBearerOptions _options, ConfigurationManager _configuration)
     {
-        var jwtKey = configuration["Authentication:Jwt-RefreshToken:PrivateKey"] ?? throw new NullReferenceException("JWT private key not found");
-        options.TokenValidationParameters = new TokenValidationParameters
+        var jwtKey = _configuration["Authentication:Jwt-RefreshToken:PrivateKey"] ?? throw new NullReferenceException("JWT private key not found");
+        _options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
-            ValidIssuer = configuration["Authentication:Jwt-RefreshToken:Issuer"],
-            ValidAudiences = configuration.GetSection("Authentication:Jwt-RefreshToken:Audience").Get<string[]>(),
+            ValidAlgorithms = [SecurityAlgorithms.HmacSha512],
+            ValidIssuer = _configuration["Authentication:Jwt-RefreshToken:Issuer"],
+            ValidAudiences = _configuration.GetSection("Authentication:Jwt-RefreshToken:Audience").Get<string[]>(),
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
         };
         
-        options.Events = new JwtBearerEvents
+        _options.Events = new JwtBearerEvents
         {
             OnTokenValidated = async context =>
             {
@@ -104,7 +106,7 @@ public class JwtAuthenticationHandler
                 }
 
                 var sessionService = context.HttpContext.RequestServices.GetRequiredService<SessionService>();
-                if (await sessionService.IsSessionExists($"refresh_{userId}", sessionId) == false)
+                if (await sessionService.IsSessionExists($"refresh_{userId}", sessionId) == false && _configuration.GetSection("IsSessionEnable").Get<bool>())
                 {
                     context.Fail(new SecurityTokenException("Session has expired."));
                     return;
@@ -120,6 +122,8 @@ public class JwtAuthenticationHandler
             },
             OnChallenge = context =>
             {
+                context.HandleResponse();
+
                 context.Response.StatusCode = 401;
                 context.Response.ContentType = "application/json";
                 return Task.CompletedTask;

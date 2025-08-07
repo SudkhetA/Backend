@@ -49,8 +49,9 @@ public class SessionService(IConnectionMultiplexer _redis, IHostEnvironment _env
 
     public async Task<bool> IsSessionExists(string name, string sessionId)
     {
-        var json = await _redisDb.HashGetAsync($"session:{_environment.EnvironmentName.ToLower()}:{name}", ClaimTypes.PrimarySid);
-        var value = JsonSerializer.Deserialize<string>(json.ToString());
+        var redisValue = await _redisDb.HashGetAsync($"session:{_environment.EnvironmentName.ToLower()}:{name}", ClaimTypes.PrimarySid);
+        if (redisValue.IsNullOrEmpty) return false;
+        var value = JsonSerializer.Deserialize<string>(redisValue.ToString());
         return value == sessionId;
     }
 

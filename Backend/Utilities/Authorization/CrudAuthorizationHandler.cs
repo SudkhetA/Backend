@@ -10,8 +10,12 @@ namespace Backend.Utilities.Authorization
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, CrudAuthorizationRequirement requirement)
         {
             if (context.Resource is DefaultHttpContext resourceHttpContext && context.User.Identity != null && context.User.Identity.IsAuthenticated) {
-                var roleJson = context.User.FindFirst(x => x.Type == ClaimTypes.Role)!.Value;
-                var roleIds = JsonSerializer.Deserialize<long[]>(roleJson)!;
+                var roleIds = context.User.FindAll(ClaimTypes.Role).Select(x => long.Parse(x.Value)).ToList();
+                if (roleIds == null || roleIds.Count == 0)
+                {
+                    context.Fail();
+                    return Task.CompletedTask;
+                }
 
                 var roleMenu = new List<RoleMenu>();
                 foreach(var roleId in roleIds)

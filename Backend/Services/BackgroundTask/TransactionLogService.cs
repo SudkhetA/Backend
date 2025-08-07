@@ -1,6 +1,5 @@
 
 using Backend.Models;
-using System.Threading.Tasks;
 
 namespace Backend.Services.BackgroundTask;
 
@@ -16,7 +15,7 @@ public class TransactionLogService(
     public void Dispose()
     {
         Dispose(true);
-        GC.SuppressFinalize(true);
+        GC.SuppressFinalize(this);
     }
 
     protected virtual void Dispose(bool disposing)

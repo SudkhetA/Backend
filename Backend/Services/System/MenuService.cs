@@ -34,6 +34,8 @@ public class MenuService(DataContext _context) : ServiceBase<Menu, MenuSearch>(_
             Data = query.Skip((page - 1) * pageSize).Take(pageSize).ToList()
         };
 
+        _ = TransactionLogRead(result.Data, "system." + nameof(Menu));
+
         return Task.FromResult(result);
     }
 
