@@ -7,25 +7,25 @@ using Backend.Models.System;
 
 namespace Backend.Services.System;
 
-public class UserService(DataContext _context) : ServiceBase<User, MemberSearch>(_context)
+public class UserService(DataContext _context) : ServiceBase<User, UserSearch>(_context)
 {
-    public override Task<ReadResult> Read(MemberSearch search, int page, int pageSize)
+    public override Task<ReadResult> Read(UserSearch search, int page, int pageSize)
     {
-        var query = _context.Members.AsQueryable();
+        var query = _context.Users.AsQueryable();
 
         if (search.RoleId?.Length > 0)
         {
-            query = query.Where(x => _context.MemberRoles.Any(a => a.MemberId == x.Id && search.RoleId.Contains(a.RoleId)));
+            query = query.Where(x => _context.UserRoles.Any(a => a.UserId == x.Id && search.RoleId.Contains(a.RoleId)));
         }
 
         if (search.DocumentStatusId?.Length > 0)
         {
-            query = query.Where(x => _context.MemberDocumentStatuses.Any(a => a.MemberId == x.Id && search.DocumentStatusId.Contains(a.DocumentStatusId)));
+            query = query.Where(x => _context.UserDocumentStatuses.Any(a => a.UserId == x.Id && search.DocumentStatusId.Contains(a.DocumentStatusId)));
         }
 
         if (search.NotificationId?.Length > 0)
         {
-            query = query.Where(x => _context.MemberNotifications.Any(a => a.MemberId == x.Id && search.NotificationId.Contains(a.NotificationId)));
+            query = query.Where(x => _context.UserNotifications.Any(a => a.UserId == x.Id && search.NotificationId.Contains(a.NotificationId)));
         }
 
         query = query
@@ -43,13 +43,15 @@ public class UserService(DataContext _context) : ServiceBase<User, MemberSearch>
             Data = query.Skip((page - 1) * pageSize).Take(pageSize).ToList()
         };
 
+        _ = TransactionLogRead(result.Data, "system." + nameof(User));
+
         return Task.FromResult(result);
     }
     public override async Task<List<User>> Create(List<User> entities)
     {
         if (entities.Count != 0)
         {
-            var usernames = _context.Members.Where(x => entities.Select(a => a.Username).Contains(x.Username)).Select(x => x.Username);
+            var usernames = _context.Users.Where(x => entities.Select(a => a.Username).Contains(x.Username)).Select(x => x.Username);
 
             if (usernames.Any())
             {
@@ -73,12 +75,12 @@ public class UserService(DataContext _context) : ServiceBase<User, MemberSearch>
                     entity.Id = 0;
                     entity.Password = Convert.ToBase64String(hash);
                     entity.SaltPassword = Convert.ToBase64String(salt);
-                    entity.CreatedBy = MemberId;
+                    entity.CreatedBy = UserId;
                     entity.CreatedDate = DateTime.Now;
                 }
             }
 
-            await _context.Members.AddRangeAsync(entities);
+            await _context.Users.AddRangeAsync(entities);
             await _context.SaveChangesAsync();
 
             _ = TransactionLogCreate(entities, "system." + nameof(User));
@@ -99,7 +101,7 @@ public class UserService(DataContext _context) : ServiceBase<User, MemberSearch>
         {
             var contain = entities.Select(x => new { x.Id, x.Username});
 
-            var data = await _context.Members
+            var data = await _context.Users
                 .Where(x => contain.Contains(new { x.Id, x.Username }))
                 .ToListAsync();
 
@@ -148,13 +150,13 @@ public class UserService(DataContext _context) : ServiceBase<User, MemberSearch>
                         item.Email = entity.Email;
                     }
 
-                    item.UpdatedBy = MemberId;
+                    item.UpdatedBy = UserId;
                     item.UpdatedDate = DateTime.Now;
 
                     storage.Add(item);
                 }
             }
-            _context.Members.UpdateRange(storage);
+            _context.Users.UpdateRange(storage);
             await _context.SaveChangesAsync();
 
             _ = TransactionLogUpdate(entities, storage, "system." + nameof(User));
@@ -172,67 +174,67 @@ public class UserService(DataContext _context) : ServiceBase<User, MemberSearch>
 
     public async Task<List<Role>> GetRole(long id)
     {
-        var result = from memberRoleDb in _context.MemberRoles
-                     where memberRoleDb.MemberId == id
-                     join roleDb in _context.Roles on memberRoleDb.RoleId equals roleDb.Id
+        var result = from userRoleDb in _context.UserRoles
+                     where userRoleDb.UserId == id
+                     join roleDb in _context.Roles on userRoleDb.RoleId equals roleDb.Id
                      select roleDb;
 
         return await result.ToListAsync();
     }
 
-    public async Task<List<UserRole>> InsertMemberRole(long memberId, List<Role> roles)
+    public async Task<List<UserRole>> InsertUserRole(long userId, List<Role> roles)
     {
         if (roles.Count != 0)
         {           
             var storage = new List<UserRole>();
             foreach(var role in roles)
             {
-                var memberRole = new UserRole
+                var userRole = new UserRole
                 {
-                    MemberId = memberId,
+                    UserId = userId,
                     RoleId = role.Id!,
                 };
 
-                storage.Add(memberRole);
+                storage.Add(userRole);
             }
 
-            await _context.MemberRoles.AddRangeAsync(storage);
+            await _context.UserRoles.AddRangeAsync(storage);
             await _context.SaveChangesAsync();
         }
 
-        var result = await _context.MemberRoles
-            .Where(x => x.MemberId == memberId)
+        var result = await _context.UserRoles
+            .Where(x => x.UserId == userId)
             .ToListAsync();
 
         return result;
     }
 
-    public async Task<List<UserRole>> UpdateMemberRole(long memberId, List<Role> roles)
+    public async Task<List<UserRole>> UpdateUserRole(long userId, List<Role> roles)
     {
         if (roles.Count != 0)
         {
-            var deleteRow = _context.MemberRoles.Where(x => x.MemberId == memberId);
-            _context.MemberRoles.RemoveRange(deleteRow);
+            var deleteRow = _context.UserRoles.Where(x => x.UserId == userId);
+            _context.UserRoles.RemoveRange(deleteRow);
             await _context.SaveChangesAsync();
 
             var storage = new List<UserRole>();
             foreach(var role in roles)
             {
-                var memberRole = new UserRole
+                var userRole = new UserRole
                 {
-                    MemberId = memberId,
+                    UserId = userId,
                     RoleId = role.Id!,
                 };
 
-                storage.Add(memberRole);
+                storage.Add(userRole);
             }
 
-            await _context.MemberRoles.AddRangeAsync(storage);
+            await _context.UserRoles.AddRangeAsync(storage);
             await _context.SaveChangesAsync();
         }
 
-        var result = await _context.MemberRoles
-            .Where(x => x.MemberId == memberId)
+        var result = await _context.UserRoles
+            .Where(x => x.UserId == userId)
             .ToListAsync();
 
         return result;

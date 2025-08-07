@@ -8,7 +8,7 @@ using Backend.Utilities.Helper;
 
 namespace Backend.Controllers.System;
 
-[Route("api/System/[controller]")]
+[Route("api/system/[controller]")]
 [ApiController]
 public class NotificationController(ILogger<NotificationController> _logger, JwtHelper _jwtHelper, NotificationService _service) : ControllerBase
 {
@@ -35,8 +35,8 @@ public class NotificationController(ILogger<NotificationController> _logger, Jwt
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
 
             var data = json.Deserialize<List<Notification>>(_jsonOptions);
@@ -72,8 +72,8 @@ public class NotificationController(ILogger<NotificationController> _logger, Jwt
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
 
             var data = json.Deserialize<List<Notification>>(_jsonOptions);
@@ -105,8 +105,8 @@ public class NotificationController(ILogger<NotificationController> _logger, Jwt
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Delete([FromHeader] string authorization, [FromHeader] string userAgent, [FromBody] JsonElement json)
     {
-        _service.MemberId = _jwtHelper.GetMemberId(authorization);
-        _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+        _service.UserId = _jwtHelper.GetUserId(authorization);
+        _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
         _service.UserAgent = userAgent;
 
         var data = json.Deserialize<List<long>>(_jsonOptions);

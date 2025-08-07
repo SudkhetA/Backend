@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Backend.Models.System;
 
 [Table(nameof(UserNotification), Schema = "system")]
-[PrimaryKey(nameof(MemberId), nameof(NotificationId))]
+[PrimaryKey(nameof(UserId), nameof(NotificationId))]
 [Comment("การแจ้งที่เกี่ยวข้องกับผู้ใช้งาน")]
 public class UserNotification
 {
     [Required]
-    public long MemberId { get; set; }
+    public long UserId { get; set; }
 
     [Required]
     public long NotificationId { get; set; }
@@ -25,10 +25,10 @@ public class UserNotification
     public bool IsRead { get; set; }
 
     [ForeignKey(nameof(CreatedBy))]
-    public virtual User? MemberCreatedBy { get; set; }
+    public virtual User? UserCreatedBy { get; set; }
 
     [Required]
-    [ForeignKey(nameof(MemberId))]
+    [ForeignKey(nameof(UserId))]
     public virtual User User { get; private set; } = null!;
 
     [Required]

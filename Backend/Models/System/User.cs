@@ -42,90 +42,90 @@ public class User : ModelBase
 
     #region User
     [JsonIgnore]
-    [InverseProperty(nameof(MemberCreatedBy))]
-    public virtual ICollection<User>? MembersCreatedBy { get; } = [];
+    [InverseProperty(nameof(UserCreatedBy))]
+    public virtual ICollection<User>? UsersCreatedBy { get; } = [];
 
     [JsonIgnore]
-    [InverseProperty(nameof(MemberUpdatedBy))]
-    public virtual ICollection<User>? MembersUpdatedBy { get; } = [];
+    [InverseProperty(nameof(UserUpdatedBy))]
+    public virtual ICollection<User>? UsersUpdatedBy { get; } = [];
     #endregion
 
     #region Role
     [JsonIgnore]
-    [InverseProperty(nameof(MemberCreatedBy))]
+    [InverseProperty(nameof(UserCreatedBy))]
     public virtual ICollection<Role>? RoleCreatedBy { get; } = [];
 
     [JsonIgnore]
-    [InverseProperty(nameof(MemberUpdatedBy))]
+    [InverseProperty(nameof(UserUpdatedBy))]
     public virtual ICollection<Role>? RoleUpdatedBy { get; } = [];
     #endregion
 
     #region Menu
     [JsonIgnore]
-    [InverseProperty(nameof(MemberCreatedBy))]
+    [InverseProperty(nameof(UserCreatedBy))]
     public virtual ICollection<Menu> MenuCreatedBy { get; } = [];
 
     [JsonIgnore]
-    [InverseProperty(nameof(MemberUpdatedBy))]
+    [InverseProperty(nameof(UserUpdatedBy))]
     public virtual ICollection<Menu> MenuUpdatedBy { get; } = [];
     #endregion
 
     #region MenuType
     [JsonIgnore]
-    [InverseProperty(nameof(MemberCreatedBy))]
+    [InverseProperty(nameof(UserCreatedBy))]
     public virtual ICollection<MenuType> MenuTypeCreatedBy { get; } = [];
 
     [JsonIgnore]
-    [InverseProperty(nameof(MemberUpdatedBy))]
+    [InverseProperty(nameof(UserUpdatedBy))]
     public virtual ICollection<MenuType> MenuTypeUpdatedBy { get; } = [];
     #endregion
 
     #region DocumentStatus
     [JsonIgnore]
-    [InverseProperty(nameof(MemberCreatedBy))]
+    [InverseProperty(nameof(UserCreatedBy))]
     public virtual ICollection<DocumentStatus> DocumentStatusCreatedBy { get; } = [];
 
     [JsonIgnore]
-    [InverseProperty(nameof(MemberUpdatedBy))]
+    [InverseProperty(nameof(UserUpdatedBy))]
     public virtual ICollection<DocumentStatus> DocumentStatusUpdatedBy { get; } = [];
     #endregion
 
     #region Notification
     [JsonIgnore]
-    [InverseProperty(nameof(MemberCreatedBy))]
+    [InverseProperty(nameof(UserCreatedBy))]
     public virtual ICollection<Notification> NotificationCreatedBy { get; } = [];
 
     [JsonIgnore]
-    [InverseProperty(nameof(MemberUpdatedBy))]
+    [InverseProperty(nameof(UserUpdatedBy))]
     public virtual ICollection<Notification> NotificationUpdatedBy { get; } = [];
     #endregion
 
     #region UserRole
     [JsonIgnore]
-    public virtual ICollection<UserRole> MemberRoleCreatedBy { get; } = [];
+    public virtual ICollection<UserRole> UserRoleCreatedBy { get; } = [];
 
     public virtual List<Role> Roles { get; } = [];
-    public virtual List<UserRole> MemberRoles { get; } = [];
+    public virtual List<UserRole> UserRoles { get; } = [];
     #endregion
 
     #region UserDocumentStatus
     [JsonIgnore]
-    public virtual ICollection<UserDocumentStatus> MemberDocumentCreatedBy { get; } = [];
+    public virtual ICollection<UserDocumentStatus> UserDocumentCreatedBy { get; } = [];
     
     public virtual List<DocumentStatus> DocumentStatuses { get; } = [];
-    public virtual List<UserDocumentStatus> MemberDocumentStatuses { get; } = [];
+    public virtual List<UserDocumentStatus> UserDocumentStatuses { get; } = [];
     #endregion
 
     #region UserNotification
     [JsonIgnore]
-    public virtual ICollection<UserNotification> MemberNotificationCreatedBy { get; } = [];
+    public virtual ICollection<UserNotification> UserNotificationCreatedBy { get; } = [];
     
     public virtual List<Notification> Notifications { get; } = [];
-    public virtual List<UserNotification> MemberNotifications { get; } = [];
+    public virtual List<UserNotification> UserNotifications { get; } = [];
     #endregion
 }
 
-public class MemberSearch
+public class UserSearch
 {
     [FromQuery]
     public long[]? Id { get; set; }

@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Backend.Models;
 using Backend.Models.System;
 
@@ -9,7 +10,7 @@ public abstract class ServiceBase<TModel, TSearch>(DataContext context)
     where TModel : class
     where TSearch : class
 {
-    public long MemberId { get; set; }
+    public long UserId { get; set; }
     public string? RemoteIpAddress { get; set; }
     public string? UserAgent { get; set; }
 
@@ -37,7 +38,7 @@ public abstract class ServiceBase<TModel, TSearch>(DataContext context)
                     var transactionLog = new TransactionLog
                     {
                         TimeStamp = DateTime.Now,
-                        MemberId = MemberId,
+                        UserId = UserId,
                         OperationType = EnumOperationType.Delete,
                         TableName = "system." + nameof(User),
                         RecordId = (long)propertyInfo!.GetValue(item)!,
@@ -59,7 +60,32 @@ public abstract class ServiceBase<TModel, TSearch>(DataContext context)
         return 0;
     }
 
-    public async Task TransactionLogCreate(List<TModel> newData, string TableName)
+    public async Task TransactionLogRead(List<TModel> oldData, string tableName)
+    {
+        var propertyInfo = typeof(TModel).GetProperty("Id");
+        var transactionLogs = new List<TransactionLog>();
+        foreach (var item in oldData)
+        {
+            var transactionLog = new TransactionLog()
+            {
+                TimeStamp = DateTime.Now,
+                UserId = UserId,
+                OperationType = EnumOperationType.Read,
+                TableName = tableName,
+                RecordId = (long)propertyInfo!.GetValue(item)!,
+                OldData = JsonSerializer.Serialize(item),
+                IpAddress = RemoteIpAddress,
+                UserAgent = UserAgent,
+            };
+
+            transactionLogs.Add(transactionLog);
+        }
+
+        await _context.TransactionLogs.AddRangeAsync(transactionLogs);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task TransactionLogCreate(List<TModel> newData, string tableName)
     {
         var propertyInfo = typeof(TModel).GetProperty("Id");
         var transactionLogs = new List<TransactionLog>();
@@ -68,9 +94,9 @@ public abstract class ServiceBase<TModel, TSearch>(DataContext context)
             var transactionLog = new TransactionLog()
             {
                 TimeStamp = DateTime.Now,
-                MemberId = MemberId,
+                UserId = UserId,
                 OperationType = EnumOperationType.Create,
-                TableName = TableName,
+                TableName = tableName,
                 RecordId = (long)propertyInfo!.GetValue(item)!,
                 NewData = JsonSerializer.Serialize(item),
                 IpAddress = RemoteIpAddress,
@@ -84,7 +110,7 @@ public abstract class ServiceBase<TModel, TSearch>(DataContext context)
         await _context.SaveChangesAsync();
     }
 
-    public async Task TransactionLogUpdate(List<TModel> oldData, List<TModel> newData, string TableName)
+    public async Task TransactionLogUpdate(List<TModel> oldData, List<TModel> newData, string tableName)
     {
         if (oldData.Count == newData.Count)
         {
@@ -96,9 +122,9 @@ public abstract class ServiceBase<TModel, TSearch>(DataContext context)
                 var transactionLog = new TransactionLog()
                 {
                     TimeStamp = DateTime.Now,
-                    MemberId = MemberId,
+                    UserId = UserId,
                     OperationType = EnumOperationType.Update,
-                    TableName = TableName,
+                    TableName = tableName,
                     RecordId = (long)propertyInfo!.GetValue(oldData[index])!,
                     OldData = JsonSerializer.Serialize(oldData[index]),
                     NewData = JsonSerializer.Serialize(newData[index]),
@@ -118,7 +144,7 @@ public abstract class ServiceBase<TModel, TSearch>(DataContext context)
         }
     }
 
-    public async Task TransactionLogDelete(List<TModel> oldData, string TableName)
+    public async Task TransactionLogDelete(List<TModel> oldData, string tableName)
     {
         var propertyInfo = typeof(TModel).GetProperty("Id");
         var transactionLogs = new List<TransactionLog>();
@@ -127,9 +153,9 @@ public abstract class ServiceBase<TModel, TSearch>(DataContext context)
             var transactionLog = new TransactionLog()
             {
                 TimeStamp = DateTime.Now,
-                MemberId = MemberId,
+                UserId = UserId,
                 OperationType = EnumOperationType.Delete,
-                TableName = TableName,
+                TableName = tableName,
                 RecordId = (long)propertyInfo!.GetValue(item)!,
                 OldData = JsonSerializer.Serialize(item),
                 IpAddress = RemoteIpAddress,

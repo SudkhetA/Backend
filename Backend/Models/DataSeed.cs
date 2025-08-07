@@ -11,8 +11,8 @@ public class DataSeed
     {
         context.Database.EnsureCreated();
 
-        var member = context.Members.FirstOrDefault(x => x.Username == "developer");
-        if (member == null)
+        var user = context.Users.FirstOrDefault(x => x.Username == "developer");
+        if (user == null)
         {
             var salt = new byte[16];
             RandomNumberGenerator.Fill(salt);
@@ -22,7 +22,7 @@ public class DataSeed
             salt.CopyTo(combine, passwordBytes.Length);
             var hash = SHA256.HashData(combine);
 
-            member = new User
+            user = new User
             {
                 Username = "developer",
                 Password = Convert.ToBase64String(hash),
@@ -31,11 +31,11 @@ public class DataSeed
                 Email = "sudkhet.a04@gmail.com",
                 SaltPassword = Convert.ToBase64String(salt)
             };
-            context.Members.Add(member);
+            context.Users.Add(user);
             context.SaveChanges();
 
-            member.CreatedBy = member.Id;
-            context.Members.Update(member);
+            user.CreatedBy = user.Id;
+            context.Users.Update(user);
             context.SaveChanges();
         }
 
@@ -45,21 +45,21 @@ public class DataSeed
             role = new Role
             {
                 Name = "Developer",
-                CreatedBy = member.Id,
+                CreatedBy = user.Id,
             };
             context.Roles.Add(role);
             context.SaveChanges();
         }
 
-        var memberRole = context.MemberRoles.FirstOrDefault(x => x.MemberId == member.Id);
-        if (memberRole == null)
+        var userRole = context.UserRoles.FirstOrDefault(x => x.UserId == user.Id);
+        if (userRole == null)
         {
-            memberRole = new UserRole
+            userRole = new UserRole
             {
-                MemberId = member.Id,
+                UserId = user.Id,
                 RoleId = role.Id,
             };
-            context.MemberRoles.Add(memberRole);
+            context.UserRoles.Add(userRole);
             context.SaveChanges();
         }
 
@@ -69,7 +69,7 @@ public class DataSeed
             apiMenuType = new MenuType
             {
                 Name = EnumMenuType.Api,
-                CreatedBy = member.Id,
+                CreatedBy = user.Id,
             };
             context.MenuTypes.Add(apiMenuType);
             context.SaveChanges();
@@ -81,7 +81,7 @@ public class DataSeed
             pageMenuType = new MenuType
             {
                 Name = EnumMenuType.Page,
-                CreatedBy = member.Id,
+                CreatedBy = user.Id,
             };
             context.MenuTypes.Add(pageMenuType);
             context.SaveChanges();
@@ -89,7 +89,7 @@ public class DataSeed
 
         var apiMenuDefault = new List<(string name, string path)>
         {
-            ("User", "/api/system/member"),
+            ("User", "/api/system/user"),
             ("Role", "/api/system/role"),
             ("Menu", "/api/system/menu")
         };
@@ -108,7 +108,7 @@ public class DataSeed
                         Name = name,
                         Path = path,
                         MenuTypeId = apiMenuType.Id,
-                        CreatedBy = member.Id,
+                        CreatedBy = user.Id,
                     };
                     data.Add(menu);
                 }
@@ -121,8 +121,8 @@ public class DataSeed
         var pageMenuDefault = new List<(string name, string path)>
         {
             ("Index", "/"),
-            ("User", "/member"),
-            ("MemberInfo", "/member/info"),
+            ("User", "/user"),
+            ("UserInfo", "/user/info"),
             ("Role", "/role"),
             ("RoleInfo", "/role/info")
         };
@@ -141,7 +141,7 @@ public class DataSeed
                         Name = name,
                         Path = path,
                         MenuTypeId = pageMenuType.Id,
-                        CreatedBy = member.Id,
+                        CreatedBy = user.Id,
                     };
                     data.Add(menu);
                 }
@@ -165,7 +165,7 @@ public class DataSeed
                     IsRead = true,
                     IsUpdate = true,
                     IsDelete = true,
-                    CreatedBy = member.Id,
+                    CreatedBy = user.Id,
                 };
 
                 roleMenus.Add(roleMenu);
@@ -182,7 +182,7 @@ public class DataSeed
                     IsRead = true,
                     IsUpdate = true,
                     IsDelete = true,
-                    CreatedBy = member.Id,
+                    CreatedBy = user.Id,
                 };
 
                 roleMenus.Add(roleMenu);

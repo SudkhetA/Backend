@@ -32,16 +32,16 @@ public class JwtAuthenticationHandler
 
                 var claimsPrincipal = context.Principal;
                 var sessionId = claimsPrincipal?.FindFirst(claim => claim.Type == ClaimTypes.PrimarySid)?.Value;
-                var memberId = claimsPrincipal?.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+                var userId = claimsPrincipal?.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
 
-                if (string.IsNullOrEmpty(memberId) || string.IsNullOrEmpty(sessionId))
+                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(sessionId))
                 {
                     context.Fail("User ID or Session ID could not be validated.");
                     return;
                 }
 
                 var sessionService = context.HttpContext.RequestServices.GetRequiredService<SessionService>();
-                if (await sessionService.IsSessionExists($"access_{memberId}", sessionId) == false)
+                if (await sessionService.IsSessionExists($"access_{userId}", sessionId) == false)
                 {
                     context.Fail("Session has expired.");
                     return;
@@ -95,16 +95,16 @@ public class JwtAuthenticationHandler
 
                 var claimsPrincipal = context.Principal;
                 var sessionId = claimsPrincipal?.FindFirst(claim => claim.Type == ClaimTypes.PrimarySid)?.Value;
-                var memberId = claimsPrincipal?.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+                var userId = claimsPrincipal?.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
 
-                if (string.IsNullOrEmpty(memberId) || string.IsNullOrEmpty(sessionId))
+                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(sessionId))
                 {
                     context.Fail("User ID or Session ID could not be validated.");
                     return;
                 }
 
                 var sessionService = context.HttpContext.RequestServices.GetRequiredService<SessionService>();
-                if (await sessionService.IsSessionExists($"refresh_{memberId}", sessionId) == false)
+                if (await sessionService.IsSessionExists($"refresh_{userId}", sessionId) == false)
                 {
                     context.Fail(new SecurityTokenException("Session has expired."));
                     return;

@@ -55,9 +55,9 @@ public class AuthenticationServiceTest
 
         using var context = new DataContext(options);
 
-        context.Members.Add(new() { Id = 1, FirstName = "admin", LastName = "admin", Username = "admin", Password = Convert.ToBase64String(hash), SaltPassword = Convert.ToBase64String(salt), Email = "admin@admin.com" });
+        context.Users.Add(new() { Id = 1, FirstName = "admin", LastName = "admin", Username = "admin", Password = Convert.ToBase64String(hash), SaltPassword = Convert.ToBase64String(salt), Email = "admin@admin.com" });
         context.Roles.Add(new() { Id = 1, Name = "admin" });
-        context.MemberRoles.Add(new() { MemberId = 1, RoleId = 1 });
+        context.UserRoles.Add(new() { UserId = 1, RoleId = 1 });
         context.SaveChanges();
 
         var mockIMemoryCache = new Mock<IMemoryCache>();

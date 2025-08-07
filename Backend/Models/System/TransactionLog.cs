@@ -14,7 +14,7 @@ public class TransactionLog
     public DateTime TimeStamp { get; set; }
 
     [Required]
-    public long MemberId { get; set; }
+    public long UserId { get; set; }
 
     [Required]
     public EnumOperationType OperationType { get; set; }

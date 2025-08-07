@@ -9,7 +9,7 @@ using Backend.Utilities.Helper;
 
 namespace Backend.Controllers.System;
 
-[Route("api/System/[controller]")]
+[Route("api/system/[controller]")]
 [ApiController]
 public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelper, UserService _service) : ControllerBase
 {
@@ -19,7 +19,7 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
     [Authorize("Read")]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Read(MemberSearch search, [FromQuery] int page = 1, [FromQuery] int pageSize = 1000)
+    public async Task<IActionResult> Read(UserSearch search, [FromQuery] int page = 1, [FromQuery] int pageSize = 1000)
     {
         var data = await _service.Read(search, page, pageSize);
         
@@ -31,12 +31,12 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromHeader] string authorization, [FromHeader(Name = "User-Agent")] string userAgent, [FromBody] JsonElement json)
+    public async Task<IActionResult> Create([FromHeader] string authorization, [FromHeader(Name = "user-agent")] string userAgent, [FromBody] JsonElement json)
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
 
             var data = json.Deserialize<List<User>>(_jsonOptions);
@@ -45,7 +45,7 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
                 var result = await _service.Create(data);
                 _logger.LogInformation("{result} rows were created", result.Count);
 
-                var url = "api/system/member?" + string.Join("&", result.Select(x => $"id={x.Id}"));
+                var url = "api/system/user?" + string.Join("&", result.Select(x => $"id={x.Id}"));
                 return Created(url, null);
             }
             else
@@ -66,12 +66,12 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Update([FromHeader] string authorization, [FromHeader(Name = "User-Agent")] string userAgent, [FromBody] JsonElement json)
+    public async Task<IActionResult> Update([FromHeader] string authorization, [FromHeader(Name = "user-agent")] string userAgent, [FromBody] JsonElement json)
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
 
             var data = json.Deserialize<List<User>>(_jsonOptions);
@@ -80,7 +80,7 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
                 var result = await _service.Create(data);
                 _logger.LogInformation("{result} rows were updated", result.Count);
                 
-                var url = "api/system/member?" + string.Join("&", result.Select(x => $"id={x.Id}"));
+                var url = "api/system/user?" + string.Join("&", result.Select(x => $"id={x.Id}"));
                 return Created(url, null);
             }
             else
@@ -100,12 +100,12 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Delete([FromHeader] string authorization, [FromHeader(Name = "User-Agent")] string userAgent, [FromBody] JsonElement json)
+    public async Task<IActionResult> Delete([FromHeader] string authorization, [FromHeader(Name = "user-agent")] string userAgent, [FromBody] JsonElement json)
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
 
             var data = json.Deserialize<List<long>>(_jsonOptions);
@@ -141,19 +141,19 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> InsertMemberRole([FromHeader] string authorization, [FromHeader(Name = "User-Agent")] string userAgent, [FromBody] JsonElement json)
+    public async Task<IActionResult> InsertUserRole([FromHeader] string authorization, [FromHeader(Name = "user-agent")] string userAgent, [FromBody] JsonElement json)
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
 
-            var memberId = json.GetProperty("memberId").GetInt64();
+            var userId = json.GetProperty("userId").GetInt64();
             var roles = json.GetProperty("roles").Deserialize<List<Role>>(_jsonOptions);
-            if (memberId != 0 && roles != null && roles.Count != 0) 
+            if (userId != 0 && roles != null && roles.Count != 0) 
             {
-                var result = await _service.InsertMemberRole(memberId, roles);
+                var result = await _service.InsertUserRole(userId, roles);
                 _logger.LogInformation("{result} rows were updated", result.Count);
                 return Created();
             }
@@ -174,19 +174,19 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateMemberRole([FromHeader] string authorization, [FromHeader(Name = "User-Agent")] string userAgent, [FromBody] JsonElement json)
+    public async Task<IActionResult> UpdateUserRole([FromHeader] string authorization, [FromHeader(Name = "user-agent")] string userAgent, [FromBody] JsonElement json)
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
             
-            var memberId = json.GetProperty("memberId").GetInt64();
+            var userId = json.GetProperty("userId").GetInt64();
             var roles = json.GetProperty("roles").Deserialize<List<Role>>(_jsonOptions);
-            if (memberId != 0 && roles != null && roles.Count != 0) 
+            if (userId != 0 && roles != null && roles.Count != 0) 
             {
-                var result = await _service.UpdateMemberRole(memberId, roles);
+                var result = await _service.UpdateUserRole(userId, roles);
                 _logger.LogInformation("{result} rows were updated", result.Count);
                 return Created();
             }

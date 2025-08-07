@@ -35,8 +35,8 @@ public class RoleController(ILogger<RoleController> _logger, JwtHelper _jwtHelpe
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
 
             var data = json.Deserialize<List<Role>>(_jsonOptions);
@@ -70,8 +70,8 @@ public class RoleController(ILogger<RoleController> _logger, JwtHelper _jwtHelpe
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
 
             var data = json.Deserialize<List<Role>>(_jsonOptions);
@@ -102,8 +102,8 @@ public class RoleController(ILogger<RoleController> _logger, JwtHelper _jwtHelpe
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Delete([FromHeader] string authorization, [FromHeader] string userAgent, [FromBody] JsonElement json)
     {
-        _service.MemberId = _jwtHelper.GetMemberId(authorization);
-        _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+        _service.UserId = _jwtHelper.GetUserId(authorization);
+        _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
         _service.UserAgent = userAgent;
 
         var data = json.Deserialize<List<long>>(_jsonOptions);
@@ -137,8 +137,8 @@ public class RoleController(ILogger<RoleController> _logger, JwtHelper _jwtHelpe
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
 
             var roleId = json.GetProperty("roleId").GetInt64();
@@ -170,8 +170,8 @@ public class RoleController(ILogger<RoleController> _logger, JwtHelper _jwtHelpe
     {
         try
         {
-            _service.MemberId = _jwtHelper.GetMemberId(authorization);
-            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _service.UserId = _jwtHelper.GetUserId(authorization);
+            _service.RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
             _service.UserAgent = userAgent;
 
             var roleId = json.GetProperty("roleId").GetInt64();

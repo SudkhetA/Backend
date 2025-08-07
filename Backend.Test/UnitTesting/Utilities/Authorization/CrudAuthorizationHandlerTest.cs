@@ -21,9 +21,9 @@ public class CrudAuthorizationHandlerTest
             .Options;
 
         using var context = new DataContext(options);
-        context.Members.Add(new() { Id = 1, FirstName = "admin", LastName = "admin", Username = "admin", Password = "", Email = "", SaltPassword = "" });
+        context.Users.Add(new() { Id = 1, FirstName = "admin", LastName = "admin", Username = "admin", Password = "", Email = "", SaltPassword = "" });
         context.Roles.Add(new() { Id = 1, Name = "admin" });
-        context.MemberRoles.Add(new () { MemberId = 1, RoleId = 1 });
+        context.UserRoles.Add(new () { UserId = 1, RoleId = 1 });
         context.MenuTypes.Add(new () { Id = 1, Name = Models.System.EnumMenuType.Api});
         context.Menus.Add(new () { Id = 1, Name = "index", MenuTypeId = 1, Path = "/"});
         context.RoleMenus.Add(new () { RoleId = 1, MenuId = 1, IsRead = true, IsCreate = true, IsUpdate = true, IsDelete = true });
@@ -81,9 +81,9 @@ public class CrudAuthorizationHandlerTest
             .Options;
 
         using var context = new DataContext(options);
-        context.Members.Add(new() { Id = 1, FirstName = "admin", LastName = "admin", Username = "admin", Password = "", Email = "", SaltPassword = "" });
+        context.Users.Add(new() { Id = 1, FirstName = "admin", LastName = "admin", Username = "admin", Password = "", Email = "", SaltPassword = "" });
         context.Roles.Add(new() { Id = 1, Name = "admin" });
-        context.MemberRoles.Add(new () { MemberId = 1, RoleId = 1 });
+        context.UserRoles.Add(new () { UserId = 1, RoleId = 1 });
         context.MenuTypes.Add(new () { Id = 1, Name = Models.System.EnumMenuType.Api});
         context.Menus.Add(new () { Id = 1, Name = "index", MenuTypeId = 1, Path = "/"});
         context.RoleMenus.Add(new () { RoleId = 1, MenuId = 1, IsRead = true, IsCreate = true, IsUpdate = true, IsDelete = false });

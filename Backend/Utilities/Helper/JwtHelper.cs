@@ -6,13 +6,13 @@ namespace Backend.Utilities.Helper;
 
 public class JwtHelper
 {
-    public long GetMemberId(string jwtToken)
+    public long GetUserId(string jwtToken)
     {
         var token = jwtToken.Replace("Bearer", "").Trim();
         var payload = new JwtSecurityTokenHandler().ReadJwtToken(token);
-        var memberId = long.Parse(payload.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+        var userId = long.Parse(payload.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
 
-        return memberId;
+        return userId;
     }
 
     public List<long> GetRoleId(string jwtToken)

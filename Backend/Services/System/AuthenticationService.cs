@@ -22,15 +22,15 @@ public class AuthenticationService(
 {
     private UserInfo? AuthenticateUser(string username, string password)
     {
-        var member = _context.Members
+        var user = _context.Users
             .Where(x => x.Username!.ToLower() == username.ToLower()
                         && x.IsActive == true)
             .Include(x => x.Roles)
             .FirstOrDefault();
 
-        if (member != null)
+        if (user != null)
         {
-            var salt = Convert.FromBase64String(member.SaltPassword);
+            var salt = Convert.FromBase64String(user.SaltPassword);
             var passwordBytes = Encoding.UTF8.GetBytes(password);
 
             var combine = new byte[passwordBytes.Length + salt.Length];
@@ -38,15 +38,15 @@ public class AuthenticationService(
             salt.CopyTo(combine, passwordBytes.Length);
             var hash = Convert.ToBase64String(SHA256.HashData(combine));
 
-            if (member.Password.Equals(hash))
+            if (user.Password.Equals(hash))
             {
-                var roleId = member.Roles.Select(x => x.Id);
+                var roleId = user.Roles.Select(x => x.Id);
 
                 var user = new UserInfo()
                 {
-                    MemberId = member.Id.ToString(),
-                    Name = $"{member.FirstName} {member.LastName}",
-                    Email = member.Email,
+                    UserId = user.Id.ToString(),
+                    Name = $"{user.FirstName} {user.LastName}",
+                    Email = user.Email,
                     RoleIds = [.. roleId]
                 };
 
@@ -69,7 +69,7 @@ public class AuthenticationService(
             { "aud", _configuration.GetSection("Authentication:Jwt-AccessToken:Audience").Get<string[]>() },
             { "exp", new DateTimeOffset(expires.ToUniversalTime()).ToUnixTimeSeconds() },
             { ClaimTypes.PrimarySid, Guid.NewGuid().ToString()},
-            { ClaimTypes.NameIdentifier, user.MemberId},
+            { ClaimTypes.NameIdentifier, user.UserId},
             { ClaimTypes.Name, user.Name},
             { ClaimTypes.Role, user.RoleIds},
             { "email", user.Email }
@@ -77,7 +77,7 @@ public class AuthenticationService(
 
         var token = new JwtSecurityToken(jwtHeader, jwtPayload);
 
-        await _sessionService.StoreSessionAsync($"access_{user.MemberId}", jwtPayload, expires - DateTime.Now);
+        await _sessionService.StoreSessionAsync($"access_{user.UserId}", jwtPayload, expires - DateTime.Now);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
@@ -94,14 +94,14 @@ public class AuthenticationService(
             { "aud", _configuration.GetSection("Authentication:Jwt-RefreshToken:Audience").Get<string[]>() },
             { "exp", new DateTimeOffset(expires.ToUniversalTime()).ToUnixTimeSeconds() },
             { ClaimTypes.PrimarySid, Guid.NewGuid().ToString()},
-            { ClaimTypes.NameIdentifier, user.MemberId},
+            { ClaimTypes.NameIdentifier, user.UserId},
             { ClaimTypes.Name, user.Name},
             { ClaimTypes.Role, user.RoleIds},
             { "email", user.Email }
         };
         var token = new JwtSecurityToken(jwtHeader, jwtPayload);
 
-        await _sessionService.StoreSessionAsync($"refresh_{user.MemberId}", jwtPayload, expires - DateTime.Now);
+        await _sessionService.StoreSessionAsync($"refresh_{user.UserId}", jwtPayload, expires - DateTime.Now);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
     
@@ -132,13 +132,13 @@ public class AuthenticationService(
         var token = authorization.Replace("Bearer ", "");
         var payload = new JwtSecurityTokenHandler().ReadJwtToken(token);
 
-        var memberId = payload.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        var userId = payload.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         var name = payload.Claims.First(x => x.Type == ClaimTypes.Name).Value;
         var roleIds = JsonSerializer.Deserialize<List<long>>(payload.Claims.First(x => x.Type == ClaimTypes.Role).Value);
 
         var user = new UserInfo()
         {
-            MemberId = memberId,
+            UserId = userId,
             Name = name,
             RoleIds = roleIds!
         };
@@ -175,7 +175,7 @@ public class AuthenticationService(
 
     private class UserInfo
     {
-        public string MemberId { get; init; } = string.Empty;
+        public string UserId { get; init; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public List<long> RoleIds { get; init; } = [];

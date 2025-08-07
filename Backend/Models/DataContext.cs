@@ -7,10 +7,10 @@ namespace Backend.Models
     {
         #region System
         public virtual DbSet<DocumentStatus> DocumentStatuses { get; set; }
-        public virtual DbSet<User> Members { get; set;}
-        public virtual DbSet<UserDocumentStatus> MemberDocumentStatuses { get; set; }
-        public virtual DbSet<UserNotification> MemberNotifications { get; set; }
-        public virtual DbSet<UserRole> MemberRoles { get; set;}
+        public virtual DbSet<User> Users { get; set;}
+        public virtual DbSet<UserDocumentStatus> UserDocumentStatuses { get; set; }
+        public virtual DbSet<UserNotification> UserNotifications { get; set; }
+        public virtual DbSet<UserRole> UserRoles { get; set;}
         public virtual DbSet<Menu> Menus { get; set;}
         public virtual DbSet<MenuDocumentStatus> MenuDocumentStatuses { get; set; }
         public virtual DbSet<MenuType> MenuTypes { get; set; }
@@ -25,22 +25,22 @@ namespace Backend.Models
             modelBuilder.Entity<User>(x => 
             {
                 x.HasMany(e => e.DocumentStatuses)
-                    .WithMany(e => e.Members)
+                    .WithMany(e => e.Users)
                     .UsingEntity<UserDocumentStatus>(
-                        l => l.HasOne(e => e.DocumentStatus).WithMany(e => e.MemberDocumentStatuses),
-                        r => r.HasOne(e => e.User).WithMany(e => e.MemberDocumentStatuses));
+                        l => l.HasOne(e => e.DocumentStatus).WithMany(e => e.UserDocumentStatuses),
+                        r => r.HasOne(e => e.User).WithMany(e => e.UserDocumentStatuses));
 
                 x.HasMany(e => e.Notifications)
-                    .WithMany(e => e.Members)
+                    .WithMany(e => e.Users)
                     .UsingEntity<UserNotification>(
-                        l => l.HasOne(e => e.Notification).WithMany(e => e.MemberNotifications),
-                        r => r.HasOne(e => e.User).WithMany(e => e.MemberNotifications));
+                        l => l.HasOne(e => e.Notification).WithMany(e => e.UserNotifications),
+                        r => r.HasOne(e => e.User).WithMany(e => e.UserNotifications));
                 
                 x.HasMany(e => e.Roles)
-                    .WithMany(e => e.Members)
+                    .WithMany(e => e.Users)
                     .UsingEntity<UserRole>(
-                        l => l.HasOne(e => e.Role).WithMany(e => e.MemberRoles),
-                        r => r.HasOne(e => e.User).WithMany(e => e.MemberRoles));
+                        l => l.HasOne(e => e.Role).WithMany(e => e.UserRoles),
+                        r => r.HasOne(e => e.User).WithMany(e => e.UserRoles));
             });
 
             modelBuilder.Entity<Menu>(x =>

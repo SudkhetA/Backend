@@ -28,7 +28,7 @@ public class RoleMenu
     public bool IsDelete { get; set; }
 
     [ForeignKey(nameof(CreatedBy))]
-    public virtual User? MemberCreatedBy { get; set; }
+    public virtual User? UserCreatedBy { get; set; }
 
     [Required]
     [ForeignKey(nameof(RoleId))]

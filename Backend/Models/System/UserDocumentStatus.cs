@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Backend.Models.System;
 
 [Table(nameof(UserDocumentStatus), Schema = "system")]
-[PrimaryKey(nameof(MemberId), nameof(DocumentStatusId))]
+[PrimaryKey(nameof(UserId), nameof(DocumentStatusId))]
 [Comment("ผู้ใช้งานที่เกี่ยวข้องกับสถานะเอกสาร")]
 public class UserDocumentStatus
 {
     [Required]
-    public long MemberId { get; set; }
+    public long UserId { get; set; }
 
     [Required]
     public long DocumentStatusId { get; set; }
@@ -23,10 +23,10 @@ public class UserDocumentStatus
     public bool IsActive { get; set; } = true;
 
     [ForeignKey(nameof(CreatedBy))]
-    public virtual User? MemberCreatedBy { get; set; }
+    public virtual User? UserCreatedBy { get; set; }
 
     [Required]
-    [ForeignKey(nameof(MemberId))]
+    [ForeignKey(nameof(UserId))]
     public virtual User User { get; private set; } = null!;
 
     [Required]

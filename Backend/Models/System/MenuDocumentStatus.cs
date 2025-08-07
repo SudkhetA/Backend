@@ -23,7 +23,7 @@ public class MenuDocumentStatus
     public bool IsActive { get; set; } = true;
 
     [ForeignKey(nameof(CreatedBy))]
-    public virtual User? MemberCreatedBy { get; set; }
+    public virtual User? UserCreatedBy { get; set; }
 
     [Required]
     [ForeignKey(nameof(MenuId))]

@@ -10,9 +10,9 @@ public class RoleService(DataContext _context) : ServiceBase<Role, RoleSearch>(_
     {
         var query = _context.Roles.AsQueryable();
 
-        if (search.MemberId?.Length > 0)
+        if (search.UserId?.Length > 0)
         {
-            query = query.Where(x => _context.MemberRoles.Any(a => a.RoleId == x.Id && search.MemberId.Contains(a.MemberId)));
+            query = query.Where(x => _context.UserRoles.Any(a => a.RoleId == x.Id && search.UserId.Contains(a.UserId)));
         }
 
         if (search.MenuId?.Length > 0)
@@ -43,7 +43,7 @@ public class RoleService(DataContext _context) : ServiceBase<Role, RoleSearch>(_
             {
                 entity.Id = 0;
                 entity.CreatedDate = DateTime.Now;
-                entity.CreatedBy = MemberId;
+                entity.CreatedBy = UserId;
             }
 
             await _context.Roles.AddRangeAsync(entities);
@@ -76,7 +76,7 @@ public class RoleService(DataContext _context) : ServiceBase<Role, RoleSearch>(_
                         item.Name = entity.Name;
                     }
 
-                    item.UpdatedBy = MemberId;
+                    item.UpdatedBy = UserId;
                     item.UpdatedDate = DateTime.Now;
 
                     storage.Add(item);
@@ -114,7 +114,7 @@ public class RoleService(DataContext _context) : ServiceBase<Role, RoleSearch>(_
                 {
                     RoleId = roleId,
                     MenuId = menu.Id!,
-                    CreatedBy = MemberId,
+                    CreatedBy = UserId,
                     CreatedDate = DateTime.Now,
                 };
 
@@ -143,15 +143,15 @@ public class RoleService(DataContext _context) : ServiceBase<Role, RoleSearch>(_
             var storage = new List<RoleMenu>();
             foreach(var menu in menus)
             {
-                var memberRole = new RoleMenu
+                var userRole = new RoleMenu
                 {
                     RoleId = roleId,
                     MenuId = menu.Id!,
-                    CreatedBy = MemberId,
+                    CreatedBy = UserId,
                     CreatedDate = DateTime.Now,
                 };
 
-                storage.Add(memberRole);
+                storage.Add(userRole);
             }
 
             await _context.RoleMenus.AddRangeAsync(storage);

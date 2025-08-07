@@ -10,9 +10,9 @@ public class NotificationService(DataContext _context) : ServiceBase<Notificatio
     {
         var query = _context.Notifications.AsQueryable();
 
-        if (search.MemberId?.Length > 0)
+        if (search.UserId?.Length > 0)
         {
-            query = query.Where(x => _context.MemberNotifications.Any(a => a.NotificationId == x.Id && search.MemberId.Contains(a.MemberId)));
+            query = query.Where(x => _context.UserNotifications.Any(a => a.NotificationId == x.Id && search.UserId.Contains(a.UserId)));
         }
 
         query = query
@@ -36,7 +36,7 @@ public class NotificationService(DataContext _context) : ServiceBase<Notificatio
             foreach (var entity in entities)
             {
                 entity.Id = 0;
-                entity.CreatedBy = MemberId;
+                entity.CreatedBy = UserId;
                 entity.CreatedDate = DateTime.Now;
             }
 
@@ -80,7 +80,7 @@ public class NotificationService(DataContext _context) : ServiceBase<Notificatio
                         item.LinkPage = entity.LinkPage;
                     }
 
-                    item.UpdatedBy = MemberId;
+                    item.UpdatedBy = UserId;
                     item.UpdatedDate = DateTime.Now;
 
                     storage.Add(item);

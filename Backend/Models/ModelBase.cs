@@ -23,8 +23,8 @@ public abstract class ModelBase
     public bool IsActive { get; set; } = true;
 
     [ForeignKey(nameof(CreatedBy))]
-    public virtual User? MemberCreatedBy { get; private set; }
+    public virtual User? UserCreatedBy { get; private set; }
 
     [ForeignKey(nameof(UpdatedBy))]
-    public virtual User? MemberUpdatedBy { get; private set; }
+    public virtual User? UserUpdatedBy { get; private set; }
 }

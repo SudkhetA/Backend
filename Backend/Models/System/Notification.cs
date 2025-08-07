@@ -19,12 +19,12 @@ public class Notification : ModelBase
     [StringLength(2048)]
     public string? LinkPage { get; set; }
 
-    public virtual List<User> Members { get; } = [];
-    public virtual List<UserNotification> MemberNotifications { get; } = [];
+    public virtual List<User> Users { get; } = [];
+    public virtual List<UserNotification> UserNotifications { get; } = [];
 }
 
 public class NotificationSearch
 {
     public long[]? Id { get; set; }
-    public long[]? MemberId { get; set; }
+    public long[]? UserId { get; set; }
 }
