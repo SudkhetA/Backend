@@ -31,8 +31,8 @@ public class JwtAuthenticationHandler
                 var jwtHelper = new JwtHelper();
 
                 var claimsPrincipal = context.Principal;
-                var sessionId = claimsPrincipal?.FindFirst(claim => claim.Type == ClaimTypes.PrimarySid)?.Value;
-                var userId = claimsPrincipal?.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+                var sessionId = claimsPrincipal?.FindFirst(claim => claim.Type == "sessionId")?.Value;
+                var userId = claimsPrincipal?.FindFirst(claim => claim.Type == "userId")?.Value;
 
                 if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(sessionId))
                 {
@@ -96,8 +96,8 @@ public class JwtAuthenticationHandler
                 var jwtHelper = new JwtHelper();
 
                 var claimsPrincipal = context.Principal;
-                var sessionId = claimsPrincipal?.FindFirst(claim => claim.Type == ClaimTypes.PrimarySid)?.Value;
-                var userId = claimsPrincipal?.FindFirst(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+                var sessionId = claimsPrincipal?.FindFirst(claim => claim.Type == "sessionId")?.Value;
+                var userId = claimsPrincipal?.FindFirst(claim => claim.Type == "userId")?.Value;
 
                 if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(sessionId))
                 {

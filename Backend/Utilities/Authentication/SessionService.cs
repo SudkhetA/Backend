@@ -9,7 +9,7 @@ public class SessionService(IConnectionMultiplexer _redis, IHostEnvironment _env
 {
     private readonly IDatabase _redisDb = _redis.GetDatabase();
 
-    public async Task StoreSessionAsync(string sessionId, JwtPayload data)
+    public async Task StoreSessionAsync(string userId, JwtPayload data)
     {
         var hashEntries = new HashEntry[data.Count];
         for (int index = 0; index < data.Count; index++)
@@ -17,11 +17,11 @@ public class SessionService(IConnectionMultiplexer _redis, IHostEnvironment _env
             hashEntries[index] = new HashEntry(data.ElementAt(index).Key, JsonSerializer.Serialize(data.ElementAt(index).Value));
         }
 
-        var key = $"session:{_environment.EnvironmentName.ToLower()}:{sessionId}";
+        var key = $"session:{_environment.EnvironmentName.ToLower()}:{userId}";
         await _redisDb.HashSetAsync(key, hashEntries, CommandFlags.None);
         await _redisDb.KeyExpireAsync(key, TimeSpan.FromMinutes(30));
     }
-    public async Task StoreSessionAsync(string sessionId, JwtPayload data, TimeSpan expiration)
+    public async Task StoreSessionAsync(string userId, JwtPayload data, TimeSpan expiration)
     {
         var hashEntries = new HashEntry[data.Count];
         for (int index = 0; index < data.Count; index++)
@@ -29,14 +29,14 @@ public class SessionService(IConnectionMultiplexer _redis, IHostEnvironment _env
             hashEntries[index] = new HashEntry(data.ElementAt(index).Key, JsonSerializer.Serialize(data.ElementAt(index).Value));
         }
 
-        var key = $"session:{_environment.EnvironmentName.ToLower()}:{sessionId}";
+        var key = $"session:{_environment.EnvironmentName.ToLower()}:{userId}";
         await _redisDb.HashSetAsync(key, hashEntries, CommandFlags.None);
         await _redisDb.KeyExpireAsync(key, expiration);
     }
 
-    public async Task<List<Claim>> GetSessionAsync(string sessionId)
+    public async Task<List<Claim>> GetSessionAsync(string userId)
     {
-        var hashEntries = await _redisDb.HashGetAllAsync($"session:{sessionId}");
+        var hashEntries = await _redisDb.HashGetAllAsync($"session:{_environment.EnvironmentName.ToLower()}:{userId}");
         var claims = new List<Claim>();
 
         foreach (var item in hashEntries)
@@ -49,7 +49,7 @@ public class SessionService(IConnectionMultiplexer _redis, IHostEnvironment _env
 
     public async Task<bool> IsSessionExists(string name, string sessionId)
     {
-        var redisValue = await _redisDb.HashGetAsync($"session:{_environment.EnvironmentName.ToLower()}:{name}", ClaimTypes.PrimarySid);
+        var redisValue = await _redisDb.HashGetAsync($"session:{_environment.EnvironmentName.ToLower()}:{name}", "sessionId");
         if (redisValue.IsNullOrEmpty) return false;
         var value = JsonSerializer.Deserialize<string>(redisValue.ToString());
         return value == sessionId;

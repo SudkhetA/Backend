@@ -68,10 +68,10 @@ public class AuthenticationService(
             { "iss", _configuration["Authentication:Jwt-AccessToken:Issuer"] },
             { "aud", _configuration.GetSection("Authentication:Jwt-AccessToken:Audience").Get<string[]>() },
             { "exp", new DateTimeOffset(expires.ToUniversalTime()).ToUnixTimeSeconds() },
-            { ClaimTypes.PrimarySid, Guid.NewGuid().ToString()},
-            { ClaimTypes.NameIdentifier, user.UserId},
-            { ClaimTypes.Name, user.Name},
-            { ClaimTypes.Role, user.RoleIds},
+            { "sessionId", Guid.NewGuid().ToString()},
+            { "userId", user.UserId},
+            { "name", user.Name},
+            { "role", user.RoleIds},
             { "email", user.Email }
         };
 
@@ -93,10 +93,10 @@ public class AuthenticationService(
             { "iss", _configuration["Authentication:Jwt-RefreshToken:Issuer"] },
             { "aud", _configuration.GetSection("Authentication:Jwt-RefreshToken:Audience").Get<string[]>() },
             { "exp", new DateTimeOffset(expires.ToUniversalTime()).ToUnixTimeSeconds() },
-            { ClaimTypes.PrimarySid, Guid.NewGuid().ToString()},
-            { ClaimTypes.NameIdentifier, user.UserId},
-            { ClaimTypes.Name, user.Name},
-            { ClaimTypes.Role, user.RoleIds},
+            { "sessionId", Guid.NewGuid().ToString()},
+            { "userId", user.UserId},
+            { "name", user.Name},
+            { "role", user.RoleIds},
             { "email", user.Email }
         };
         var token = new JwtSecurityToken(jwtHeader, jwtPayload);
@@ -132,15 +132,18 @@ public class AuthenticationService(
         var token = authorization.Replace("Bearer ", "");
         var payload = new JwtSecurityTokenHandler().ReadJwtToken(token);
 
-        var userId = payload.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        var name = payload.Claims.First(x => x.Type == ClaimTypes.Name).Value;
-        var roleIds = JsonSerializer.Deserialize<List<long>>(payload.Claims.First(x => x.Type == ClaimTypes.Role).Value);
+        var userId = payload.Claims.First(x => x.Type == "userId").Value;
+        var name = payload.Claims.First(x => x.Type == "name").Value;
+        var roleIds = payload.Claims
+            .Where(x => x.Type == "role")
+            .Select(x => long.Parse(x.Value))
+            .ToList();
 
         var user = new UserInfo()
         {
             UserId = userId,
             Name = name,
-            RoleIds = roleIds!
+            RoleIds = roleIds
         };
 
         var accessTokenExpires = DateTime.Now.AddMinutes(30);

@@ -44,9 +44,9 @@ public class CrudAuthorizationHandlerTest
         
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, "1"),
-            new(ClaimTypes.Name, "admin admin"),
-            new(ClaimTypes.Role, "[1]")
+            new("userId", "1"),
+            new("name", "admin admin"),
+            new("role", "1")
         };
         var identity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
         var claimsPrincipal = new ClaimsPrincipal(identity);
@@ -104,9 +104,9 @@ public class CrudAuthorizationHandlerTest
         
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, "1"),
-            new(ClaimTypes.Name, "admin admin"),
-            new(ClaimTypes.Role, "[1]")
+            new("userId", "1"),
+            new("name", "admin admin"),
+            new("role", "1")
         };
         var identity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
         var claimsPrincipal = new ClaimsPrincipal(identity);

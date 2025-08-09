@@ -138,9 +138,9 @@ public class AuthenticationServiceTest
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, "1"),
-            new(ClaimTypes.Name, "admin"),
-            new(ClaimTypes.Role, "[1]")
+            new("userId", "1"),
+            new("name", "admin"),
+            new("role", "[1]")
         };
 
         var token = new JwtSecurityToken(

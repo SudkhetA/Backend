@@ -10,7 +10,7 @@ public class JwtHelper
     {
         var token = jwtToken.Replace("Bearer", "").Trim();
         var payload = new JwtSecurityTokenHandler().ReadJwtToken(token);
-        var userId = long.Parse(payload.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+        var userId = long.Parse(payload.Claims.First(x => x.Type == "userId").Value);
 
         return userId;
     }
@@ -20,7 +20,7 @@ public class JwtHelper
         var token = jwtToken.Replace("Bearer", "").Trim();
         var payload = new JwtSecurityTokenHandler().ReadJwtToken(token);
         var result = payload.Claims
-            .Where(x => x.Type == ClaimTypes.Role)
+            .Where(x => x.Type == "role")
             .Select(x => long.Parse(x.Value))
             .ToList();
 
