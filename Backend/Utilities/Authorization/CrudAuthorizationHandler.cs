@@ -9,7 +9,7 @@ namespace Backend.Utilities.Authorization
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, CrudAuthorizationRequirement requirement)
         {
             if (context.Resource is DefaultHttpContext resourceHttpContext && context.User.Identity != null && context.User.Identity.IsAuthenticated) {
-                var roleIds = context.User.FindAll("role").Select(x => long.Parse(x.Value)).ToList();
+                var roleIds = context.User.FindAll(ClaimTypes.Role).Select(x => long.Parse(x.Value)).ToList();
                 if (roleIds == null || roleIds.Count == 0)
                 {
                     context.Fail();

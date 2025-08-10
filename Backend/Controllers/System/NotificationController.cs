@@ -58,7 +58,7 @@ public class NotificationController(ILogger<NotificationController> _logger, Jwt
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 
@@ -94,7 +94,7 @@ public class NotificationController(ILogger<NotificationController> _logger, Jwt
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 

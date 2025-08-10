@@ -57,7 +57,7 @@ public class RoleController(ILogger<RoleController> _logger, JwtHelper _jwtHelpe
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 
@@ -91,7 +91,7 @@ public class RoleController(ILogger<RoleController> _logger, JwtHelper _jwtHelpe
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 
@@ -157,7 +157,7 @@ public class RoleController(ILogger<RoleController> _logger, JwtHelper _jwtHelpe
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 
@@ -190,7 +190,7 @@ public class RoleController(ILogger<RoleController> _logger, JwtHelper _jwtHelpe
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 }

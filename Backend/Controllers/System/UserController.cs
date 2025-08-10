@@ -46,18 +46,17 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
                 _logger.LogInformation("{result} rows were created", result.Count);
 
                 var url = "api/system/user?" + string.Join("&", result.Select(x => $"id={x.Id}"));
-                return Created(url, null);
+                return Created(url, result);
             }
             else
             {
                 return BadRequest("data not found");
             }
-            
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 
@@ -81,7 +80,7 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
                 _logger.LogInformation("{result} rows were updated", result.Count);
                 
                 var url = "api/system/user?" + string.Join("&", result.Select(x => $"id={x.Id}"));
-                return Created(url, null);
+                return Created(url, result);
             }
             else
             {
@@ -91,7 +90,7 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 
@@ -123,7 +122,7 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 
@@ -165,7 +164,7 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 
@@ -198,7 +197,7 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
         catch (Exception ex)
         {
             _logger.LogError(ex, "{message}", ex.Message);
-            return BadRequest(ex.Message);
+            return StatusCode(500, ex);
         }
     }
 }
