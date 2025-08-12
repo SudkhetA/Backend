@@ -76,7 +76,7 @@ public class UserController(ILogger<UserController> _logger, JwtHelper _jwtHelpe
             var data = json.Deserialize<List<User>>(_jsonOptions);
             if (data != null && data.Count != 0) 
             {
-                var result = await _service.Create(data);
+                var result = await _service.Update(data);
                 _logger.LogInformation("{result} rows were updated", result.Count);
                 
                 var url = "api/system/user?" + string.Join("&", result.Select(x => $"id={x.Id}"));

@@ -99,18 +99,11 @@ public class UserService(DataContext _context) : ServiceBase<User, UserSearch>(_
     {
         if (entities.Count != 0)
         {
-            var contain = entities.Select(x => new { x.Id, x.Username});
+            var contain = entities.Select(x => x.Id);
 
             var data = await _context.Users
-                .Where(x => contain.Contains(new { x.Id, x.Username }))
+                .Where(x => contain.Contains(x.Id))
                 .ToListAsync();
-
-            var usernames = data.Select(x => x.Username);
-
-            if (usernames.Any())
-            {
-                throw new Exception($"\"{string.Join(", ", usernames)}\" this username already exists");
-            }
 
             var storage = new List<User>();
             foreach (var entity in entities)
